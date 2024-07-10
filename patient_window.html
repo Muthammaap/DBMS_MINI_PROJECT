@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Window</title>
+  <style>
+    /* Your CSS styles */
+    .appointment-card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 50px auto;
+      border-radius: 12px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      width: 750px;
+    }
+
+    #appointments h2 {
+      margin: 20px 0;
+    }
+
+    .diagnosis-btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .diagnosis-btn {
+      background-color: red;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .diagnosis-btn:hover {
+      background-color: darkred;
+    }
+
+    .flex-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .patient-container {
+      flex: 1;
+      margin-top: 10px;
+      max-width: 35%;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 12px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .show-medicines-btn {
+      background-color: blue;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .show-medicines-btn:hover {
+      background-color: darkblue;
+    }
+
+    #patientImage {
+      width: 70px;
+      height: 75px;
+      border-radius: 5px;
+    }
+
+    .button-container {
+      flex: 2;
+      max-width: 40%;
+      margin-top: 20px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid #ccc;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .go-to-doctors-btn {
+      background-color: rgba(9, 79, 5, 0.923);
+      width: 100px;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .go-to-doctors-btn:hover {
+      background-color: darkblue;
+    }
+
+    #buttonImage {
+      width: 60%;
+      height: 90%;
+      border-radius: 5px;
+      margin-left: 10px;
+      animation: floatAnimation 3s ease-in-out infinite;
+    }
+
+    @keyframes floatAnimation {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .patient-container,
+    #appointments {
+      opacity: 0;
+    }
+
+    .patient-container.animated,
+    #appointments.animated {
+      opacity: 1;
+    }
+
+    .patient-container.animated {
+      animation: fadeInUp 1s ease-in-out;
+    }
+
+    #appointments.animated {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .avatar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    #patientImage {
+      width: 70px;
+      height: 75px;
+      border-radius: 50%;
+    }
+
+    .upload-image-btn {
+      margin-top: 5px;
+      background-color: #007bff;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .upload-image-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .name-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .name-text {
+      margin-right: 5px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <header
+    style="background-color: #007bff; color: white; text-align: center; font-size: x-large; padding: 40px; border-radius: 20px;">
+    Patient Dashboard
+  </header>
+  <div class="flex-container">
+    <div id="patientContainer" class="patient-container">
+      <h2>Patient Details</h2>
+      <div class="avatar-container">
+        <img id="patientImage" src="${getimageurl}" alt="Patient Image"><br>
+          <button class="upload-image-btn" onclick="document.getElementById('image').click()">Upload Image</button> 
+          <input type="file" name="image" id="image" accept="image/*" style="display: none;" onchange="uploadImage()">
+
+
+      </div>
+      <div id="myModal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeModal()">&times;</span>
+          <form id="uploadForm" action="" method="post" enctype="multipart/form-data">
+            <label for="image">Choose an image:</label>
+            <input type="file" name="image" id="image" accept="image/*" required>
+            <br>
+            <button type="submit">Upload Image</button>
+          </form>
+          
+        </div>
+      </div>
+      <br>
+      <div class="name-container">
+        <span class="name-text">Name:</span>
+        <span id="patientName"></span>
+      </div>
+      <p>Email: <span id="patientEmail"></span></p>
+      <p>Phone: <span id="patientPhone"></span></p>
+      <p>Address: <span id="patientAddress"></span></p>
+      <button class="logout-btn" onclick="logout()" style="padding: 10px 20px; background-color: rgba(223, 16, 16, 0.992); color: black; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='darkblue'" onmouseout="this.style.backgroundColor='blue'">Log Out</button>
+    </div>
+
+    <div class="button-container" style="margin-top: 20px;">
+      <div class="diagnosis-btn-container">
+        <img id="buttonImage" src="images/book.jpg" alt="Additional Image">
+      </div>
+
+      <div class="go-to-doctors-btn" onclick="navigateToDoctors()">Go to Doctors</div>
+      <p>Want to book an appointment?</p>
+    </div>
+  </div>
+
+  <div id="appointments">
+    <h2 style="background-color: #007bff; color: white; padding: 10px; border-radius: 10px;">Appointments</h2>
+    <!-- This section will be filled with appointment cards dynamically -->
+  </div>
+
+  <script>
+    history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+      history.go(1);
+    };
+
+    // Retrieve the patient details from session storage
+   // Retrieve the patient details from session storage
+var patientDetails = JSON.parse(sessionStorage.getItem('patientDetailss'));
+var authToken = JSON.parse(sessionStorage.getItem('authToken')); // Use the same key "authToken" here
+console.log("authToken: " + authToken);
+var patientemail = patientDetails.PatientEmail;
+const PatientId = patientDetails.id;
+
+
+    var patientImageElement = document.getElementById('patientImage');
+var getImageUrl = `api/uploads/${patientemail}patient.jpeg`;
+patientImageElement.src = getImageUrl;
+
+
+
+  
+    // Log the patient details to the console
+    console.log('Patient Details:', patientDetails);
+
+    // Display the patient details on the page
+    if (patientDetails) {
+      // Update the HTML elements with patient details using the correct case
+      document.getElementById('patientName').innerText = patientDetails.PatientName;
+      document.getElementById('patientEmail').innerText = patientDetails.PatientEmail;
+      document.getElementById('patientPhone').innerText = patientDetails.ContactNo;
+      document.getElementById('patientAddress').innerText = patientDetails.Address;
+
+      // Add "animated" class to trigger entrance animation for patient container
+      document.getElementById('patientContainer').classList.add('animated');
+
+      // Fetch and display appointments
+      fetch(`http://localhost:3000/appointment/appointment/patient/${PatientId}`,
+      {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${authToken}`, // Include the token in the headers
+            'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(appointments => {
+          renderAppointments(appointments.appointments);
+          // Add "animated" class to trigger entrance animation for appointments section
+          document.getElementById('appointments').classList.add('animated');
+        })
+        .catch(error => console.error('Error fetching appointments:', error));
+    }
+
+    function renderAppointments(appointments) {
+      if (!sessionStorage.getItem("patientDetailss")) {
+        window.location.href = 'index.html'; // Redirect to the login page
+        return;
+      }
+      var appointmentsContainer = document.getElementById('appointments');
+
+      if (appointments && appointments.length > 0) {
+        appointments.forEach(appointment => {
+          // Create appointment card
+          var appointmentCard = document.createElement('div');
+          appointmentCard.className = 'appointment-card';
+
+          // Display appointment details
+          appointmentCard.innerHTML = `
+                        <p>ID:${appointment.id}</p>
+                        <p>Appointment id: ${appointment.AppointmentId}</p>
+                        <p>Patient Id: ${appointment.PatientId}</p>
+                        <p>Appointment Date: ${appointment.AppointmentDate}</p>
+                        <p>Appointment Time: ${appointment.AppointmentTime}</p>
+                        <p>Symptoms: ${appointment.Symptoms}</p>
+                        <p>Remarks: ${appointment.Remarks}</p>
+                        <button class="diagnosis-btn" onclick="navigateToReport(${appointment.id})">Diagnosis Report</button>
+                        <button class="show-medicines-btn" onclick="navigateToShowMedicines(${appointment.id})">Show Medicines</button>
+
+                    `;
+
+          // Append card to the container
+          appointmentsContainer.appendChild(appointmentCard);
+
+          // Add click event listener to the Diagnosis button
+          var diagnosisBtn = appointmentCard.querySelector('.diagnosis-btn');
+          diagnosisBtn.addEventListener('click', function () {
+            // Print some text to the console when the button is clicked
+            console.log('Diagnosis button clicked for appointment:', appointment.AppointmentId);
+          });
+        });
+      } else {
+        console.log('No appointments found.');
+        appointmentsContainer.innerHTML = '<p>No appointments found.</p>';
+      }
+    }
+
+
+    function navigateToReport(id) {
+      console.log("Navigating to report for appointment id: ", id);
+      sessionStorage.setItem("selectedID", id);
+      window.location.href = 'report.html';
+    }
+
+    function navigateToShowMedicines(id) {
+      console.log("Navigating to medicines for appointment id: ", id);
+      sessionStorage.setItem("selectedID", id);
+      window.location.href = 'show_medicine.html';
+    }
+    // Function to navigate to doctors.html
+    function navigateToDoctors() {
+      window.location.href = 'doctors.html';
+    }
+
+    function logout() {
+      // Clear session storage
+      sessionStorage.removeItem("patientDetailss");
+      sessionStorage.removeItem("authToken"); // Remove the authentication token
+      
+      // Make a request to the logout endpoint on the server (optional)
+      fetch('http://localhost:3000/patient/logout', {
+          method: 'POST',
+          headers: {
+              'Authorization': `Bearer ${authToken}`, // Include the token if required for server-side validation
+          },
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log('Logout Response:', data);
+      })
+      .catch(error => {
+          console.error('Error during logout:', error);
+      });
+  
+      // Redirect to index.html
+      window.location.href = 'index.html';
+  }
+    
+
+    // Function to close modal
+    function closeModal() {
+      var modal = document.getElementById("myModal");
+      modal.style.display = "none";
+    }
+
+
+    function uploadImage() {
+      var doctorFormData = sessionStorage.getItem("patientDetailss");
+      var patientEmail = JSON.parse(doctorFormData).PatientEmail; // Parse the JSON string
+  
+      // Retrieve the file input element
+      var fileInput = document.getElementById('image');
+      // Retrieve the selected file
+      var file = fileInput.files[0];
+  
+      // Create a FormData object
+      var formData = new FormData();
+      formData.append('image', file);
+  
+      // Create an HTMLImageElement to load the selected image
+      var img = new Image();
+      
+      // Load the selected image into the HTMLImageElement
+      img.src = URL.createObjectURL(file);
+  
+      // Define a function to be executed when the image is loaded
+      img.onload = function () {
+          // Create a canvas element
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+  
+          // Set the canvas dimensions to match the image dimensions
+          canvas.width = 100; // Set the desired width (you can adjust this)
+          canvas.height = 100; // Set the desired height (you can adjust this)
+  
+          // Draw the image onto the canvas
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          // Convert the canvas content to a base64 encoded data URL with JPEG format
+          var resizedImageDataUrl = canvas.toDataURL('image/jpeg');
+  
+          // Convert the base64 data URL to a Blob
+          var blob = dataURLtoBlob(resizedImageDataUrl);
+  
+          // Create a new FormData object
+          var resizedFormData = new FormData();
+          resizedFormData.append('image', blob, 'avatar.jpeg');
+  
+          // Send the resized image data to the server
+          fetch(`http://localhost:3000/image/uploads/${patientEmail}patient`, {
+              method: 'POST',
+              body: resizedFormData
+          })
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                  // Handle the response data
+                  console.log('Resized image uploaded successfully:', data);
+              })
+              .catch(error => {
+                  console.error('There was a problem with the resized image upload:', error);
+              });
+      };
+  }
+  
+  // Function to convert a data URL to a Blob
+  function dataURLtoBlob(dataURL) {
+      var arr = dataURL.split(','), mime = arr[0].match(/:(.*?);/)[1],
+          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+      while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+  }
+
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor's Appointment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+        integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #errorMessage {
+            
+            color: red;
+            margin-top: 10px; /* Add margin to separate it from other elements */
+            font-weight: bold;
+        }
+        #errorMessage1 {
+            
+            color: red;
+            margin-top: 10px; /* Add margin to separate it from other elements */
+            font-weight: bold;
+        }
+        .popup-container {
+            position: relative;
+            z-index: 9999;
+            background-color: #ddf9e3;
+            /* Default color */
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .password-suffix {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        .error-message {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            color: red;
+            font-size: 12px;
+        }
+
+        #loginModal {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            /* Adjust the transparency of the modal background */
+        }
+
+        #PatientloginForm,
+        #doctorLoginForm {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #fff;
+        }
+
+
+        #signupModal {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            /* Adjust the transparency of the modal background */
+        }
+
+        #patientForm,
+        #doctorForm {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #fff;
+        }
+
+
+        #patientSignupBtn,
+        #doctorSignupBtn {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        #patientLoginBtn,
+        #doctorLoginBtn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #patientSignupBtn:hover,
+        #doctorSignupBtn:hover,
+        #patientLoginBtn:hover,
+        #doctorLoginBtn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(255, 255, 255, 0.5);
+            /* Semi-transparent white background */
+            backdrop-filter: blur(10px);
+            /* Adjust the blur effect as needed */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Icon Styles */
+        .icon {
+            margin-right: 10px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label {
+            flex: 0 0 30px;
+            /* Adjust based on icon size */
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero section  -->
+    <div class="hero-container">
+        <!-- navigation -->
+        <header>
+            <nav class="nav-container animate_animated animate_fadeInDown">
+                <div class="logo">
+                    <h2>HealthSync Hub</h2>
+                </div>
+                <div class="menu-links">
+                    <a href="index.html#home">Home</a>
+                    <a href="doctors.html#doctors">Doctors</a>
+                    <a href="pharmacy.html#pharmacy">Pharmacy</a>
+                    <a href="services.html#services">Services</a>
+                    <a href="appointments.html#appointments">Appointments</a>
+                    <a href="about.html#about">About</a>
+                </div>
+                <div class="nav-btn">
+                    <button id="signupBtn" class="btn btn-primary">Sign Up</button>
+                    <button id="loginBtn" class="btn btn-secondary">Login</button>
+                </div>
+            </nav>
+        </header>
+        <!-- hero-content  -->
+
+        <section class="hero">
+            <div class="container">
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="animate_animated animate_bounce">Your Path to Health and Happiness <span
+                                class="hero-text">begins with a click.
+                            </span> </h1>
+                        <p>Join us and take care of yourself and your family with health services that will make you
+                            feel
+                            confident and safe in your daily life.</p>
+                        <div class="hero-btn">
+                            <a href="doctors.html#" class="btn btn-primary">Try Now</a>
+                            <a href="doctors.html#" class="btn btn-secondary">Book Appointment</a>
+                        </div>
+                    </div>
+                    <div class="hero-img">
+                        <img src="images/doctor-img.svg" alt="Doctor">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+
+
+    <!-- Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Sign Up</h2>
+            <button id="patientSignupBtn">Patient</button>
+            <button id="doctorSignupBtn">Doctor</button>
+
+            <div id="patientForm" style="display: none;">
+                <div id="popupContainer"></div>
+
+                <h3>Patient Signup</h3>
+                <form id="signUpForm" method="post">
+                    <div class="form-group">
+                        <label for="PatientName"><i class="fas fa-user-md icon"></i></label>
+                        <input type="text" placeholder="Name" id="PatientName" name="PatientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="PatientDOB"><i class="fas fa-user-tag icon"></i></label>
+                        <input type="date" placeholder="DOB" id="PatientDOB" name="PatientDOB" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Address"><i class="far fa-calendar-check icon"></i></label>
+                        <input type="text" placeholder="Address" id="Address" name="Address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ContactNo"><i class="far fa-calendar-check icon"></i></label>
+                        <input type="text" placeholder="Contact No" id="ContactNo" name="ContactNo" pattern="[0-9]{10}"
+                            title="Contact number must be 10 digits" required>
+                        <span id="contactNoMessage" class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="PatientEmail"><i class="fas fa-envelope icon"></i></label>
+                        <input type="email" placeholder="Email" id="PatientEmail" name="PatientEmail"
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required>
+                        <span id="emailMessage" class="error-message"></span>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="PatientPassword"><i class="fas fa-lock icon"></i></label>
+                        <input type="password" placeholder="Password" id="PatientPassword" name="PatientPassword"
+                            pattern=".{6,}" title="Password must be at least 6 characters long" required>
+                        <span class="password-suffix" onclick="togglePasswordVisibility('PatientPassword')"><i
+                                class="fas fa-eye"></i></span>
+                        <span id="passwordMessage" class="error-message"></span>
+                    </div>
+
+                    <button type="submit" onclick="submitForm(event)"
+                        style="background-color:#28a745; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Sign
+                        up</button>
+                </form>
+
+            </div>
+            <div id="doctorForm" style="display: none;">
+                <div id="popupContainer"></div>
+
+                <h3>Doctor Signup</h3>
+                <form id="doctorSignupForm" method="post">
+                    <div class="form-group">
+                        <label for="DoctorName"><i class="fas fa-user-md icon"></i></label>
+                        <input type="text" placeholder="Name" id="DoctorName" name="DoctorName" required>
+                    </div>
+                
+<div class="form-group">
+    <label for="DoctorEmail"><i class="fas fa-envelope icon"></i></label>
+    <input type="email" placeholder="Email" id="DoctorEmail" name="DoctorEmail"
+       required>
+    <!-- <span id="emailMessage" class="error-message"></span> -->
+</div>
+                    <div class="form-group">
+                        <label for="DoctorPassword"><i class="fas fa-lock icon"></i></label>
+                        <input type="password" placeholder="Password" id="DoctorPassword" name="DoctorPassword"
+                            pattern=".{6,}" title="Password must be at least 6 characters long" required>
+                        <span class="password-suffix" onclick="togglePasswordVisibility('DoctorPassword')"><i
+                                class="fas fa-eye"></i></span>
+                        <span id="ppasswordMessage" class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="Specialization"><i class="fas fa-user-tag icon"></i></label>
+                        <input type="text" placeholder="Specialization" id="Specialization" name="Specialization"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Availability"><i class="far fa-calendar-check icon"></i></label>
+                        <input type="text" placeholder="Availability" id="Availability" name="Availability" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Contact"><i class="far fa-calendar-check icon"></i></label>
+                        <input type="text" placeholder="Contact" id="Contact" name="Contact" pattern="[0-9]{10}"
+                            title="Contact number must be 10 digits" required>
+                        <span id="contactMessage" class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="Experience"><i class="fas fa-lock icon"></i></label>
+                        <input type="text" placeholder="Experience" id="Experience" name="Experience"
+                             required>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="ConsultationFee"><i class="fas fa-lock icon"></i></label>
+                        <input type="text" placeholder="ConsultationFee" id="ConsultationFee" name="ConsultationFee"
+                             required>
+
+                    </div>
+                    <button type="submit" onclick="submitDForm(event)"
+                        style="background-color: #28a745; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Signup</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login</h2>
+            <button id="patientLoginBtn">Patient</button>
+            <button id="doctorLoginBtn">Doctor</button>
+
+            <div id="PatientloginForm" style="display: none;">
+                <h3>Patient Login</h3>
+                <form id="loginFormContent">
+                    <div class="form-group">
+                        <label for="PatientEmail"><i class="fas fa-envelope icon"></i></label>
+                        <input type="email" placeholder="Email" id="PatientEmail" name="PatientEmail"
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required>
+                        <span id="emailMessage" class="error-message"></span>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="PatientPasswordL"><i class="fas fa-lock icon"></i></label>
+                        <input type="password" placeholder="Password" id="PatientPasswordL" name="PatientPasswordL"
+                               pattern=".{6,}" title="Password must be at least 6 characters long" required>
+                        <span class="password-suffix" onclick="togglePasswordVisibility('PatientPasswordL')">
+                            <i id="toggleIcon" class="fas fa-eye"></i>
+                        </span>
+                        <span id="passwordMessage" class="error-message"></span>
+                    </div>
+                    
+                    
+                    <button type="submit" class="btn btn-primary" onclick="submitLoginForm(event)">Login</button>
+                </form>
+
+            </div>
+
+            <div id="doctorLoginForm" style="display: none;">
+                <h3>Doctor Login</h3>
+                <form id="doctorLoginFormContent">
+                    <div class="form-group">
+                        <label for="DoctorEmail"><i class="fas fa-envelope icon"></i></label>
+                        <input type="email" placeholder="Email" id="DoctorEmail" name="DoctorEmail"
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required>
+                        <span id="emailMessage" class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="DoctorPasswordL"><i class="fas fa-lock icon"></i></label>
+                        <input type="password" placeholder="Password" id="DoctorPasswordL" name="DoctorPasswordL"
+                            pattern=".{6,}" title="Password must be at least 6 characters long" required>
+                        <span class="password-suffix" onclick="togglePasswordVisibility('DoctorPasswordL')"><i
+                                class="fas fa-eye"></i></span>
+                        <span id="passwordMessage" class="error-message"></span>
+                    </div>
+                    <div id="errorMessage1" style="color: red;"></div>
+
+                    <button type="submit" class="btn btn-primary" onclick="submitDoctorLoginForm()">Login</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- steps-section  -->
+    <section class="steps-section wow animate_animated animate_fadeInLeftBig">
+        <div class="container">
+            <div class="easy-steps">
+                <h2>Easy Steps and Get Your Solution</h2>
+
+                <div class="steps-icon-box">
+                    <div class="steps">
+                        <img src="images/search-icon.svg" alt="search icon">
+                        <h3>Find best doctor's</h3>
+                        <p>Find your doctor easily with a minimum of effort. We've kept everything organised for
+                            you.</p>
+                    </div>
+                    <div class="steps">
+                        <img src="images/Appointment-icon.png" alt="search icon">
+                        <h3>Find best Medicine's</h3>
+                        <p>Manage hustle free buying of medicines at your doorsteps</p>
+                    </div>
+                    <div class="steps">
+                        <img src="images/Consultancy-icon.png" alt="search icon">
+                        <h3>Find best Service</h3>
+                        <p>Elevate your healthcare facility's efficiency and patient care with our comprehensive
+                            service.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- about section  -->
+
+    <section class="about">
+        <div class="about-section">
+            <div class="about-img">
+                <img src="images/docs.jpg" alt="doctor">
+
+            </div>
+            <div class="about-content wow animate_animated animate_fadeInTopRight">
+                <h2>Best quality service with our experienced
+                    doctors</h2>
+                <p>With our top doctors, we are able to provide best medical services above average We have
+                    highly experienced doctors.</p>
+                <ul>
+                    <li> <i class="fas fa-check-circle"></i> Search your specialist & book at your fingertips</li>
+                    <li> <i class="fas fa-check-circle"></i> Search for medicine & Online order to your doorsteps</li>
+                    <li> <i class="fas fa-check-circle"></i> Search your specialist & Online consultations anywhere</li>
+                </ul>
+                <div class="about-btn">
+                    <a href="#" class="btn btn-primary"> Explore All Features</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- services section  -->
+    <section class="service">
+        <div class="container">
+            <div class="services-section">
+                <h2>Our Services</h2>
+                <p>Our doctors have highly qualified skills and are guaranteed to help you recover from your disease.
+                </p>
+
+                <div class="services-box">
+                    <div class="services">
+                        <img src="images/cardio-icon.svg" alt="cardio">
+                        <h3>Cardiology</h3>
+                        <p>Our cardiologists are skilled at the diagnosing and treating diseases of the cardiovascular
+                            system.</p>
+                    </div>
+                    <div class="services">
+                        <img src="images/lungs-icon.svg" alt="lungs">
+                        <h3>Dentistry</h3>
+                        <p>Dentists are doctors, scientists, and clinicians who play a key role in the early detection
+                            of oral cancer. </p>
+                    </div>
+                    <div class="services">
+                        <img src="images/lungs-icon.svg" alt="capsule">
+                        <h3>Ortho</h3>
+                        <p>Orthopaedics is the medical specialty that focuses on
+                            injuries and diseases of your
+                            body's musculoskeletal system.</p>
+                    </div>
+
+                </div>
+            </div>
+    </section>
+
+    <!-- our team section  -->
+    <section class="our-doctors">
+        <div class="container">
+            <div class="doctors-section">
+                <h2>Meet Our Certified Online Doctors</h2>
+                <div class="border"></div>
+                <p>Our online doctors have an average of 15 years experience and a 98% satisfaction rating, they really
+                    set us apart!</p>
+
+                <div class="team-section">
+                    <div class="doctors">
+                        <img src="images/doctor-linda.png" alt="Dr. Tsunade">
+                        <h3>Dr Tsunade</h3>
+                        <p>Dentist</p>
+                        <div class="social-icons">
+                            <i class="fab fa-facebook-f"></i>
+                            <i class="fab fa-twitter"></i>
+                            <i class="fab fa-linkedin-in"></i>
+                        </div>
+                    </div>
+                    <div class="doctors">
+                        <img src="images/doc.jpg" alt="Dr. Temari">
+                        <h3>Dr Temari</h3>
+                        <p>Cardiologist</p>
+                        <div class="social-icons">
+                            <i class="fab fa-facebook-f"></i>
+                            <i class="fab fa-twitter"></i>
+                            <i class="fab fa-linkedin-in"></i>
+                        </div>
+                    </div>
+                    <div class="doctors">
+                        <img src="images/dr-alisa.png" alt="Dr. Sakura">
+                        <h3>Dr Sakura </h3>
+                        <p>Ortho</p>
+                        <div class="social-icons">
+                            <i class="fab fa-facebook-f"></i>
+                            <i class="fab fa-twitter"></i>
+                            <i class="fab fa-linkedin-in"></i>
+                        </div>
+                    </div>
+                    <div class="doctors">
+                        <img src="images/dr-ant.png" alt="Dr. Hatake">
+                        <h3>Dr Hatake </h3>
+                        <p>Neurologist</p>
+                        <div class="social-icons">
+                            <i class="fab fa-facebook-f"></i>
+                            <i class="fab fa-twitter"></i>
+                            <i class="fab fa-linkedin-in"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="doctors-btn">
+                    <a href="#" class="btn btn-primary"> Explore All Features</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- mobile app  -->
+    <section class="moblieapp">
+        <div class="container">
+            <div class="moblieapp-section">
+
+            </div>
+            <!-- book appointment  -->
+            <div class="bookappointment">
+                <div class="bookapp-content">
+                    <h2>It’s time change your<br>
+                        life today</h2>
+                    <a href="#" class="btn btn-bookapp"> Book an Appoinment </a>
+                    <div class="bookapp-img">
+                        <img src="images/smiling.png" alt="Doctor-sarah">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- footer  -->
+    <footer>
+        <div class="container">
+            <div class="footer-section">
+                <div class="footer-content">
+                    <div class="footer-logo">
+                        <h2>
+                            HealthSync Hub.
+                        </h2>
+                        <div>
+                            <a>Mysore,Karnataka</a>
+                        </div>
+                        <div class="contact-num">
+                            <a>Contact us: 123-456-7891</a>
+                        </div>
+                        <div class="social-icon">
+                            <i class="fab fa-github"></i>
+                            <i class="fab fa-instagram"></i>
+                            <i class="fab fa-twitter"></i>
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                    </div>
+                    <div class="footer-category">
+                        <h3>Category</h3>
+                        <a href="index.html#home">Home</a>
+                        <a href="about.html#about">About</a>
+                        <a href="services.html#services">Services</a>
+                        <a href="#reviews">Reviews</a>
+                    </div>
+                    <div class="footer-pages">
+                        <h3>Pages</h3>
+                        <a href="index.html#home">Home</a>
+                        <a href="patient_window.html#patients">Patients</a>
+                        <a href="doctors.html#doctors">Doctors</a>
+                        <a href="pharmacy.html#pharmacy">Pharmacy</a>
+                    </div>
+
+                    <div class="footer-privacy">
+                        <h3>Privacy</h3>
+                        <a href="#Privacy">Privacy</a>
+                        <a href="#Security">Security</a>
+                        <a href="#Terms">Terms</a>
+                        <a href="#Disclaimer">Disclaimer</a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="copyright-section">
+            <div class="container">
+                <div class="copyright-content">
+                    <div class="copyright-left">
+                        <span>© 2024 HealthSync Hub - All rights reserved.</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function togglePasswordVisibility(inputId) {
+            var input = document.getElementById(inputId);
+            var icon = document.getElementById("toggleIcon");
+        
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+        
+        document.getElementById("PatientPassword").addEventListener("input", function () {
+            var password = this.value;
+            if (password.length < 6) {
+                this.setCustomValidity("Password must be at least 6 characters long");
+                document.getElementById("passwordMessage").textContent = "Password must be at least 6 characters long";
+            } else {
+                this.setCustomValidity("");
+                document.getElementById("passwordMessage").textContent = "";
+            }
+        });
+        document.getElementById("DoctorPassword").addEventListener("input", function () {
+            var password = this.value;
+            if (password.length < 6) {
+                this.setCustomValidity("Password must be at least 6 characters long");
+                document.getElementById("ppasswordMessage").textContent = "Password must be at least 6 characters long";
+            } else {
+                this.setCustomValidity("");
+                document.getElementById("ppasswordMessage").textContent = "";
+            }
+        });
+
+
+        var signupModal = document.getElementById("signupModal");
+
+        // Get the button that opens the signup modal
+        var signupBtn = document.getElementById("signupBtn");
+
+        // Get the <span> element that closes the modal
+        var closeBtn = signupModal.querySelector(".close");
+
+        // When the user clicks the button, open the modal 
+        signupBtn.onclick = function () {
+            signupModal.style.display = "block";
+        }
+        // When the user clicks on the close button, close the modal
+        closeBtn.addEventListener("click", function () {
+            signupModal.style.display = "none";
+        });
+        // When the user clicks anywhere outside of the modal, close it
+        window.addEventListener("click", function (event) {
+            if (event.target == signupModal) {
+                signupModal.style.display = "none";
+            }
+        });
+
+        // Show patient signup form when patient signup button is clicked
+        document.getElementById("patientSignupBtn").onclick = function () {
+            document.getElementById("patientForm").style.display = "block";
+            document.getElementById("doctorForm").style.display = "none";
+        };
+
+        // Show doctor signup form when doctor signup button is clicked
+        document.getElementById("doctorSignupBtn").onclick = function () {
+            document.getElementById("doctorForm").style.display = "block";
+            document.getElementById("patientForm").style.display = "none";
+        };
+
+        function submitForm(event) {
+            event.preventDefault();
+            console.log('Submit button clicked');
+
+            // Get form data
+            var formData = new FormData(document.getElementById('signUpForm'));
+
+            // Convert FormData to a plain JavaScript object
+            var formDataObject = {};
+            formData.forEach((value, key) => {
+                formDataObject[key] = value;
+            });
+
+            // Validate contact number
+            var contactNo = formDataObject["ContactNo"];
+            if (contactNo.length === 10 && /^\d+$/.test(contactNo)) {
+                // Validate password
+                var password = formDataObject["PatientPassword"];
+                if (password.length >= 6) {
+                    // Password is valid, proceed with form submission
+                    fetch('http://localhost:3000/patient/sign-up', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formDataObject),
+                        withCredentials: true
+                    })
+                        .then(response => {
+                            console.log('Server response status:', response.status); // Log response status
+                            if (response.ok) {
+                                showPatientPopup("Patient account created successfully!", true);
+                            } else {
+                                throw new Error('Failed to create patient account');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Log the response in the console
+                            console.log('Server Response:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showPatientPopup("Failed to create patient account", false);
+                        });
+                } else {
+                    // Password is invalid, show error message
+                    var passwordMessage = document.getElementById("passwordMessage");
+                    passwordMessage.textContent = "Password must be at least 6 characters long";
+                }
+            } else {
+                // Contact number is invalid, show error message
+                var contactNoMessage = document.getElementById("contactNoMessage");
+                contactNoMessage.textContent = "Contact number must be 10 digits";
+            }
+        }
+
+        function submitDForm(event) {
+            event.preventDefault();
+            var formData = new FormData(document.getElementById('doctorSignupForm'));
+            var formDataObject = {};
+
+            formData.forEach((value, key) => {
+                formDataObject[key] = value;
+            });
+            var contactNo = formDataObject["Contact"];
+            if (contactNo.length === 10 && /^\d+$/.test(contactNo)) {
+                // Validate password
+                var password = formDataObject["DoctorPassword"];
+                if (password.length >= 6) {
+                    fetch('http://localhost:3000/doctor/sign-up', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formDataObject),
+                        withCredentials: true
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                showDoctorPopup("Doctor account created successfully!", true);
+                            } else {
+                                showDoctorPopup("Failed to create doctor account", false);
+                                throw new Error('Failed to create doctor account');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Server Response:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                } else {
+                    // Password is invalid, show error message
+                    var ppasswordMessage = document.getElementById("ppasswordMessage");
+                    ppasswordMessage.textContent = "Password must be at least 6 characters long";
+                }
+            } else {
+                // Contact number is invalid, show error message
+                var contactMessage = document.getElementById("contactMessage");
+                contactMessage.textContent = "Contact number must be 10 digits";
+            }
+        }
+        var loginBtn = document.getElementById("loginBtn");
+
+        // Get the <span> element that closes the modal
+        var closeLoginBtn = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal 
+        loginBtn.onclick = function () {
+            // Initially, just open the modal without showing any form
+            loginModal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        closeLoginBtn.onclick = function () {
+            loginModal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == loginModal) {
+                loginModal.style.display = "none";
+            }
+        }
+
+        // Function to show patient login form when patient login button is clicked
+        document.getElementById("patientLoginBtn").onclick = function () {
+            document.getElementById("PatientloginForm").style.display = "block";
+            document.getElementById("doctorLoginForm").style.display = "none";
+        };
+
+        // Function to show doctor login form when doctor login button is clicked
+        document.getElementById("doctorLoginBtn").onclick = function () {
+            document.getElementById("doctorLoginForm").style.display = "block";
+            document.getElementById("PatientloginForm").style.display = "none";
+        };
+
+        // Function to handle patient login form submission
+        document.getElementById('loginFormContent').addEventListener('submit', submitLoginForm);
+
+        function submitLoginForm(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+            var input = document.getElementById('PatientPasswordL');
+            input.setAttribute('name', 'PatientPassword');
+
+            var formData = new FormData(document.getElementById('loginFormContent'));
+
+            // Convert FormData to a plain JavaScript object
+            var formDataObject = {};
+            formData.forEach((value, key) => {
+                formDataObject[key] = value;
+            });
+
+            // Make a POST request to the server with JSON data
+            fetch('http://localhost:3000/patient/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formDataObject),
+                withCredentials: true
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Log the response in the console
+                    console.log('Server Response:', data);
+                
+                    if (data && data.patient && data.token) {
+                        // If the response contains patient details and token, proceed
+                        var patientDetails = data.patient;
+                        sessionStorage.setItem("patientDetailss", JSON.stringify(patientDetails));
+                        var authToken = data.token;
+                        console.log(authToken);
+                        sessionStorage.setItem("authToken", JSON.stringify(authToken));
+                
+                        
+                            window.location.href = "patient_window.html";
+                        // Redirect only on successful authentication
+                    } else {
+                        // Handle authentication failure and display a custom message
+                        var errorMessage = data && data.message ? data.message : 'Invalid credentials. Please try again.';
+                        console.error('Authentication failed:', errorMessage);
+                
+                        var errorMessageElement = document.getElementById('errorMessage');
+                        errorMessageElement.innerText = errorMessage;
+                        errorMessageElement.style.display = 'block'; 
+                    }
+                })
+                .catch(error => {
+                    // Handle other errors (e.g., network issues)
+                    console.error('Error:', error);
+                });
+        }
+        // Function to handle doctor login form submission
+        document.getElementById('loginFormContent').addEventListener('submit', submitLoginForm);
+        doctorLoginFormContent
+        document.getElementById('doctorLoginFormContent').addEventListener('submit', submitDoctorLoginForm);
+
+        function submitDoctorLoginForm(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            var input = document.getElementById('DoctorPasswordL');
+            input.setAttribute('name','DoctorPassword');
+
+            var formData = new FormData(document.getElementById('doctorLoginFormContent'));
+
+            // Convert FormData to a plain JavaScript object
+            var formDataObject = {};
+            formData.forEach((value, key) => {
+                formDataObject[key] = value;
+            });
+
+            // Make a POST request to the server with JSON data
+            fetch('http://localhost:3000/doctor/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formDataObject),
+                withCredentials: true
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Log the response in the console
+                
+                    if (data && data.doctor && data.token) {
+                        // If the response contains doctor details and token, proceed
+                        console.log('Server Response:', data);
+                        var doctorDetails = data.doctor;
+                        sessionStorage.setItem("doctorDetailss", JSON.stringify(doctorDetails));
+                
+                        console.log(doctorDetails);
+                
+                        window.location.href = "doc_window.html"; // Redirect only on successful authentication
+                    } else {
+                        // Handle authentication failure and display a custom message
+                        var errorMessage = data && data.message ? data.message : 'Invalid credentials. Please try again.';
+                        console.error('Authentication failed:', errorMessage);
+                
+                        // Display the error message to the user with styling
+                        var errorMessageElement = document.getElementById('errorMessage1');
+                        errorMessageElement.innerText = errorMessage;
+                        errorMessageElement.style.display = 'block'; // Make sure the element is visible
+                    }
+                })
+                .catch(error => {
+                    // Handle other errors (e.g., network issues)
+                    console.error('Error:', error);
+                });
+        }
+
+        // Move the event listener outside the function
+        document.getElementById('doctorLoginFormContent').addEventListener('submit', submitDoctorLoginForm);
+
+        document.getElementById("patientsignUpForm").onsubmit = function () {
+            // Get form data
+            var formData = {
+                patientName: document.getElementById("patientName").value,
+                patientPhone: document.getElementById("patientPhone").value,
+                patientDOB: document.getElementById("patientDOB").value,
+                patientAddress: document.getElementById("patientAddress").value,
+
+            };
+            // Store form data in sessionStorage
+            sessionStorage.setItem("patientFormData", JSON.stringify(formData));
+            // Redirect to patient signup page
+            window.location.href = "index.html";
+            return false; // Prevent default form submission
+        }
+
+        // Redirect to doctor signup page after filling doctor signup form
+        document.getElementById("doctorSignupForm").onsubmit = function () {
+            // Get form data
+            var formData = {
+                doctorName: document.getElementById("doctorName").value,
+                doctorSpecialization: document.getElementById("doctorSpecialization").value,
+                doctorAvailability: document.getElementById("doctorAvailability").value
+            };
+            sessionStorage.setItem("doctorFormData", JSON.stringify(formData));
+            window.location.href = "index.html";
+            return false; // Prevent default form submission
+        }
+        function showPatientPopup(message, isSuccess) {
+            // Get the signup form element
+            var signUpForm = document.getElementById("signUpForm");
+
+            // Create a container for the popup
+            var popupContainer = document.createElement("div");
+            popupContainer.className = "popup-container";
+
+            // Create message paragraph
+            var messageParagraph = document.createElement("p");
+            messageParagraph.textContent = message;
+
+            // Create close button
+            var closeButton = document.createElement("span");
+            closeButton.className = "close-btn";
+            closeButton.textContent = "Close";
+            closeButton.onclick = function () {
+                // Remove the popup when the close button is clicked
+                signUpForm.removeChild(popupContainer);
+            };
+
+            // Append elements to the popup container
+            popupContainer.appendChild(messageParagraph);
+            popupContainer.appendChild(closeButton);
+
+            // Append the popup container to the signup form
+            signUpForm.appendChild(popupContainer);
+
+            // Add spacing between signup button and popup window
+            signUpForm.style.marginBottom = "20px"; // Adjust as needed
+
+            // Style popup based on success or failure
+            if (isSuccess) {
+                popupContainer.style.backgroundColor = "#E6FB96"; // Green for success
+            } else {
+                popupContainer.style.backgroundColor = "#FC9D81"; // Red for failure
+            }
+
+            // Remove the popup after a few seconds
+            setTimeout(function () {
+                signUpForm.removeChild(popupContainer);
+            }, 3000); // Adjust the duration (in milliseconds) as needed
+        }
+        function showDoctorPopup(message, isSuccess) {
+            // Get the signup form element
+            var signUpForm = document.getElementById("doctorSignupForm");
+
+            // Create a container for the popup
+            var popupContainer = document.createElement("div");
+            popupContainer.className = "popup-container";
+
+            // Create message paragraph
+            var messageParagraph = document.createElement("p");
+            messageParagraph.textContent = message;
+
+            // Create close button
+            var closeButton = document.createElement("span");
+            closeButton.className = "close-btn";
+            closeButton.textContent = "Close";
+            closeButton.onclick = function () {
+                // Remove the popup when the close button is clicked
+                signUpForm.removeChild(popupContainer);
+            };
+
+            // Append elements to the popup container
+            popupContainer.appendChild(messageParagraph);
+            popupContainer.appendChild(closeButton);
+
+            // Append the popup container to the signup form
+            signUpForm.appendChild(popupContainer);
+
+            // Add spacing between signup button and popup window
+            signUpForm.style.marginBottom = "20px"; // Adjust as needed
+
+            // Style popup based on success or failure
+            if (isSuccess) {
+                popupContainer.style.backgroundColor = "#E6FB96"; // Green for success
+            } else {
+                popupContainer.style.backgroundColor = "#FC9D81"; // Red for failure
+            }
+
+            // Remove the popup after a few seconds
+            setTimeout(function () {
+                signUpForm.removeChild(popupContainer);
+            }, 3000); // Adjust the duration (in milliseconds) as needed
+        }
+
+    </script>
+
+</body>
+
+</html>

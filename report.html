@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnosis Report</title>
+  <style>
+    header {
+      background-color: #6b5b95;
+      color: white;
+      text-align: center;
+      font-size: larger;
+      padding: 15px;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      border-bottom-right-radius: 15px;
+      border-bottom-left-radius: 15px;
+    }
+
+    .diagnosis-card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .download-pdf-btn {
+      background-color: green;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .download-pdf-btn:hover {
+      background-color: darkgreen;
+    }
+
+    #noReportContainer {
+      text-align: center;
+      margin-top: 20px;
+      display: none;
+    }
+
+    #noReportContainer img {
+      width: 50px;
+      height: 50px;
+    }
+  </style>
+  <script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+</head>
+
+<body>
+  <header>
+    Diagnosis Report
+  </header>
+  <div id="diagnosisDetails">
+    <!-- This section will be filled with diagnosis report details dynamically -->
+  </div>
+  <div id="noReportContainer">
+    <img src="alert-sign.png" alt="Alert Sign">
+    <p>No diagnosis report found.</p>
+  </div>
+
+  <script>
+    var selectedID = sessionStorage.getItem('selectedID');
+
+    fetch(`http://localhost:3000/diagnosisreport/${selectedID}`)
+      .then(response => response.json())
+      .then(diagnosisReports => {
+        renderDiagnosisReports(diagnosisReports);
+        fetchMedicines(selectedID);
+      })
+      .catch(error => console.error('Error fetching diagnosis report:', error));
+
+    function renderDiagnosisReports(diagnosisReports) {
+      var diagnosisDetailsContainer = document.getElementById('diagnosisDetails');
+      var noReportContainer = document.getElementById('noReportContainer');
+
+      if (diagnosisReports && diagnosisReports.length > 0) {
+        diagnosisDetailsContainer.style.display = 'block';
+        noReportContainer.style.display = 'none';
+
+        diagnosisReports.forEach(report => {
+          var diagnosisCard = document.createElement('div');
+          diagnosisCard.className = 'diagnosis-card';
+
+          diagnosisCard.innerHTML = `
+            <p>ID: ${report.id}</p>
+            <p>Appointment ID: ${report.appointmentId}</p>
+            <p>Doctor Name: ${report.doctorName}</p>
+            <p>Diagnosed For: ${report.diagnosedFor}</p>
+            <p>Diagnosis Date: ${new Date(report.diagnosisDate).toLocaleString()}</p>
+            <p>Reason: ${report.reason}</p>
+            <p>Measures: ${report.measures}</p>
+            <p>Created At: ${new Date(report.createdAt).toLocaleString()}</p>
+            <div id="medicineList_${report.id}"></div>
+            <button class="download-pdf-btn" onclick="downloadPDF('Diagnosis_Report_${report.id}')">Download PDF</button>
+          `;
+
+          diagnosisDetailsContainer.appendChild(diagnosisCard);
+        });
+      } else {
+        console.log('No diagnosis report found.');
+        diagnosisDetailsContainer.style.display = 'none';
+        noReportContainer.style.display = 'block';
+      }
+    }
+
+    function fetchMedicines(selectedID) {
+      fetch(`http://localhost:3000/medicine/${selectedID}`)
+        .then(response => response.json())
+        .then(data => {
+          renderMedicines(data.medicines, selectedID);
+        })
+        .catch(error => {
+          console.error('Error fetching medicines:', error);
+        });
+    }
+
+    function renderMedicines(medicines, selectedID) {
+      var medicineListContainer = document.getElementById(`medicineList_${selectedID}`);
+
+      if (medicineListContainer) {
+        if (medicines && medicines.length > 0) {
+          var medicineList = document.createElement('ul');
+
+          medicines.forEach(medicine => {
+            var listItem = document.createElement('li');
+            listItem.innerHTML = `
+              <strong>Medicine ID:</strong> ${medicine.mediid}<br>
+              <strong>Name:</strong> ${medicine.MedName}<br>
+              <strong>Price:</strong> ${medicine.Price}<br>
+              <strong>Manufacturer:</strong> ${medicine.Manufacturer}<br>
+              <strong>Dosage:</strong> ${medicine.Dosage}<br>
+              <strong>Duration:</strong> ${medicine.Duration}<br>
+              <br>
+            `;
+            medicineList.appendChild(listItem);
+          });
+
+          medicineListContainer.appendChild(medicineList);
+        } else {
+          console.log('No medicines found for selected ID:', selectedID);
+          medicineListContainer.innerHTML = '<p>No medicines found.</p>';
+        }
+      } else {
+        console.error('Medicine list container not found.');
+      }
+    }
+
+    function downloadPDF(filename) {
+      var element = document.getElementById('diagnosisDetails');
+      html2pdf(element, {
+        margin: 10,
+        filename: `${filename}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      });
+    }
+  </script>
+
+</body>
+
+</html>
